@@ -4,6 +4,8 @@
 
 Open Source real-time strategy game made with Godot 4.
 
+Originally created as [godot-open-rts](https://github.com/lampe-games/godot-open-rts) by Lampe Games, this repository tracks that upstream codebase while curating a fork that layers in additional space-themed assets, skyline backdrops, and supporting tools tailored for the *Aliens at War II* setting.
+
 ## Purposes of this project
 
 This game is not going to be a very advanced RTS that would compete with other games of this genre. Instead, it will focus on simplicity and clean design so that it can:
@@ -60,6 +62,7 @@ Everyone is free to fix bugs or perform refactoring just by opening PR. As for f
 See [contributors](https://github.com/lampe-games/godot-open-rts/graphs/contributors) page.
 
 ### Assets
+This fork adds and maintains the following third-party asset packs on top of the upstream project:
  - 3D Space Kit by [Kenney](https://www.kenney.nl/assets/space-kit)
  - Modular colonies from [KayKit City Builder Bits 1.0](https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0)
  - Systemic city builder references from [Egregoria](https://github.com/Uriopass/Egregoria)
