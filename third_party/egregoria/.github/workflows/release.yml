@@ -1,0 +1,204 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+env:
+  # Could, potentially automatically parse
+  # the bin name, but let's do it automatically for now.
+  RELEASE_BIN: native_app
+  HEADLESS_BIN: headless
+
+  # Space separated paths to include in the archive.
+  # Start relative paths with a dot if you don't want
+  # paths to be preserved. Use "/" as a delimiter.
+  RELEASE_ADDS: README.md LICENSE assets
+  HEADLESS_ADDS: README.md LICENSE assets/paris_54000.txt
+
+jobs:
+  build:
+    name: Build and upload release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [linux, macos, windows]
+        include:
+          - build: linux
+            os: ubuntu-latest
+          - build: macos
+            os: macos-latest
+          - build: windows
+            os: windows-latest
+
+    steps:
+      - name: Checkout github repo (+ download lfs dependencies)
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
+
+      - name: Install Rust
+        uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: 'stable'
+
+      - name: Update things
+        run: sudo apt-get update
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: install deps for linux
+        run: sudo apt-get install libasound2-dev libudev-dev pkg-config libx11-dev
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: Build app
+        run: cargo build --verbose --release -p ${{ env.RELEASE_BIN }}
+
+      - name: Build headless
+        run: cargo build --verbose --release -p ${{ env.HEADLESS_BIN }}
+
+      - name: Create artifact directory
+        run: mkdir -p artifacts
+
+      - name: Install p7zip
+        # 7Zip not available on MacOS, install p7zip via homebrew.
+        run: brew install p7zip
+        if: matrix.os == 'macos-latest'
+
+      - name: Create app archive for Linux
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}.zip ./target/release/${{ env.RELEASE_BIN }} ${{ env.RELEASE_ADDS }}
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: Create app archive for Windows
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}.zip ./target/release/${{ env.RELEASE_BIN }}.exe ${{ env.RELEASE_ADDS }}
+        if: matrix.os == 'windows-latest'
+
+      - name: Create app archive for MacOS
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}.zip ./target/release/${{ env.RELEASE_BIN }} ${{ env.RELEASE_ADDS }}
+        if: matrix.os == 'macos-latest'
+
+      - name: Create headless archive for Linux
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}-headless.zip ./target/release/${{ env.HEADLESS_BIN }} ${{ env.HEADLESS_ADDS }}
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: Create headless archive for Windows
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}-headless.zip ./target/release/${{ env.HEADLESS_BIN }}.exe ${{ env.HEADLESS_ADDS }}
+        if: matrix.os == 'windows-latest'
+
+      - name: Create headless archive for MacOS
+        run: 7z a -tzip ./artifacts/egregoria-${{ matrix.os }}-headless.zip ./target/release/${{ env.HEADLESS_BIN }} ${{ env.HEADLESS_ADDS }}
+        if: matrix.os == 'macos-latest'
+
+      # This will double-zip
+      # See - https://github.com/actions/upload-artifact/issues/39
+      - uses: actions/upload-artifact@v1
+        name: Upload app archive
+        with:
+          name: ${{ matrix.os }}
+          path: artifacts/egregoria-${{ matrix.os }}.zip
+      - uses: actions/upload-artifact@v1
+        name: Upload headless archive
+        with:
+          name: ${{ matrix.os }}
+          path: artifacts/egregoria-${{ matrix.os }}-headless.zip
+  create-release:
+    name: Create release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: macos-latest
+          path: artifacts/
+      - uses: actions/download-artifact@v2
+        with:
+          name: windows-latest
+          path: artifacts/
+      - uses: actions/download-artifact@v2
+        with:
+          name: ubuntu-latest
+          path: artifacts/
+
+      - name: print artifacts
+        run: ls -l artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset Mac
+        id: upload-release-asset-mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-macos-latest.zip
+          asset_name: macos.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-ubuntu-latest.zip
+          asset_name: linux.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset Windows
+        id: upload-release-asset-windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-windows-latest.zip
+          asset_name: windows.zip
+          asset_content_type: application/zip
+
+      - name: Upload Headless Release Asset Mac
+        id: upload-headless-release-asset-mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-macos-latest-headless.zip
+          asset_name: macos-headless.zip
+          asset_content_type: application/zip
+
+      - name: Upload Headless Release Asset Linux
+        id: upload-headless-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-ubuntu-latest-headless.zip
+          asset_name: linux-headless.zip
+          asset_content_type: application/zip
+
+      - name: Upload Headless Release Asset Windows
+        id: upload-headless-release-asset-windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./artifacts/egregoria-windows-latest-headless.zip
+          asset_name: windows-headless.zip
+          asset_content_type: application/zip

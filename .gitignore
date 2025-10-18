@@ -4,3 +4,41 @@ tmp/
 *.translation
 misc/
 build/
+
+# Developer environment
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+*.suo
+*.user
+*.userprefs
+
+# Runtime caches and logs
+*.log
+*.tmp
+*.cache
+logs/
+cache/
+profiling/
+
+# Secrets and credentials
+.env
+.env.*
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+*.csr
+*.der
+*.priv
+*.pub
+*.keystore
+*.jks
+
+# Third-party checkout metadata
+third_party/**/.git/

@@ -1,0 +1,37 @@
+[package]
+name = "native_app"
+version = "0.4.3"
+authors = ["Douady Pâris <paris.douady@hotmail.fr>"]
+edition = "2021"
+
+[dependencies]
+bytemuck      = "1.7.2"
+simulation    = { path = "../simulation" }
+geom          = { path = "../geom" }
+engine        = { path = "../engine", features = ["yakui"] }
+common        = { path = "../common" }
+networking    = { path = "../networking", optional=true }
+egui-inspect  = { path = "../egui-inspect" }
+prototypes    = { path = "../prototypes" }
+goryak        = { path = "../goryak" }
+egui          = { workspace = true }
+egui_extras   = { workspace = true }
+egui_plot     = { workspace = true }
+flat_spatial  = { workspace = true }
+ordered-float = { workspace = true }
+oddio         = { workspace = true }
+yakui         = { workspace = true }
+log           = { version = "0.4.11", features=["max_level_info", "release_max_level_info"] }
+inline_tweak  = { version = "1.1", features = ["derive"] }
+serde         = "1.0"
+slotmapd      = { version = "1.0", default-features = false }
+rayon         = "1.6"
+profiling     = { version = "1.0.8", default-features = false }
+include_dir   = "0.7.2"
+itertools     = { workspace = true }
+
+[features]
+default = []
+profile = ["profiling/profile-with-tracy"]
+multiplayer = ["networking"]
+

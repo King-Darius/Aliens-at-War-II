@@ -1,0 +1,14 @@
+.idea/*
+.idea
+logs
+/target
+**/*.rs.bk
+*.ini
+world/*
+world
+*.bc
+*.exe
+*.tar.gz
+__pycache__
+*/target*
+target*

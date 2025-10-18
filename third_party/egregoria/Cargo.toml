@@ -1,0 +1,73 @@
+[workspace]
+members = [
+    "assets_gui",
+    "common",
+    "simulation",
+    "egui-inspect",
+    "egui-inspect-derive",
+    "engine",
+    "engine_demo",
+    "geom",
+    "goryak",
+    "headless",
+    "native_app",
+    "networking",
+    "prototypes",
+]
+
+resolver = "2"
+default-members = ["native_app"]
+
+[workspace.dependencies]
+egui          = { git = "https://github.com/emilk/egui" }
+flat_spatial  = "0.6"
+egui_extras   = { git = "https://github.com/emilk/egui" }
+egui_plot     = { git = "https://github.com/emilk/egui" }
+ordered-float = { version = "4.2.0", default-features = false }
+oddio         = "0.7.4"
+derive_more   = "0.99.17"
+yakui         = { git = "https://github.com/Uriopass/yakui", branch = "dev" }
+yakui-wgpu    = { git = "https://github.com/Uriopass/yakui", branch = "dev" }
+yakui-winit   = { git = "https://github.com/Uriopass/yakui", branch = "dev" }
+yakui-core    = { git = "https://github.com/Uriopass/yakui", branch = "dev" }
+yakui-widgets = { git = "https://github.com/Uriopass/yakui", branch = "dev" }
+itertools     = { version = "0.13.0", default-features = false }
+mlua          = { version = "0.9.4", features = ["luau"] }
+# rerun         = { version = "0.17.0", default-features = false, features = ["sdk"] }
+
+# Set the settings for build scripts and proc-macros.
+[profile.dev.build-override]
+opt-level = 1
+
+[profile.dev.package."*"] # Only affects dependencies, not workspace members
+opt-level = 2
+
+[profile.dev.package.common]
+opt-level = 2
+
+[profile.dev.package.geom]
+opt-level = 2
+
+[profile.dev.package.goryak]
+opt-level = 1
+
+[profile.dev.package.engine]
+opt-level = 1
+
+[profile.dev.package.egui-inspect]
+opt-level = 1
+
+[profile.dev.package.egui-inspect-derive]
+opt-level = 1
+
+[profile.dev.package.networking]
+opt-level = 1
+
+[profile.dev.package.simulation]
+opt-level = 1
+
+[profile.dev.package.native_app]
+opt-level = 1
+
+[profile.release]
+#debug = true

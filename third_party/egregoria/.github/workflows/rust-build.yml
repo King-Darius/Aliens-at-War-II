@@ -1,0 +1,34 @@
+name: rust-build
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - v*  # don't run on tags since release does that
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo (no download lfs dependencies)
+        uses: actions/checkout@v2
+        with:
+          lfs: false
+      - name: Update things
+        run: sudo apt-get update
+      - name: install libs
+        run: sudo apt-get install libasound2-dev libudev-dev pkg-config
+      - name: Install Rust
+        uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: 'stable'
+      - name: Check
+        run: cargo check --verbose --workspace --tests --examples --features multiplayer
+      - name: Run tests
+        run: cargo test --verbose --workspace --features multiplayer -- --test-threads=1
