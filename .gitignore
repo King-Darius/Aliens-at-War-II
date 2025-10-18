@@ -1,27 +1,110 @@
 *~
-.godot/
-tmp/
-*.translation
-misc/
-build/
+.bak
+.orig
+.patched
+.swp
+.swo
+.tmp
+.temp
+.log
+.cache
 
-# Developer environment
+# Godot
+.godot/
+.import/
+*.import
+*.translation
+export/
+export_*/
+
+# Build outputs
+bin/
+obj/
+dist/
+build/
+build-*/
+cmake-build-*/
+out/
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.pdb
+*.app
+*.apk
+*.ipa
+
+# Developer tools
 .vscode/
 .idea/
+.settings/
+.vs/
+.fleet/
+.ionide/
+.history/
+.cache/
+.ccls-cache/
+.clangd/
+.mvn/
+.gradle/
+.project
+.classpath
+.cproject
+.factorypath
+.metadata/
+.recommenders/
+.loadpath
+.toolstarget
 *.code-workspace
-.DS_Store
-Thumbs.db
-*.suo
-*.user
-*.userprefs
+*.sln.iml
 
-# Runtime caches and logs
-*.log
-*.tmp
-*.cache
+# Package managers / deps
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+vendor/
+Pods/
+Packages/
+DerivedData/
+venv/
+.venv/
+ENV/
+env/
+site-packages/
+__pycache__/
+*.egg-info/
+pip-wheel-metadata/
+composer.lock
+.bundle/
+Gemfile.lock
+Cargo.lock
+poetry.lock
+
+# Logs, caches, coverage
+*.pid
+*.trace
+*.stackdump
+*.dmp
+*.out
+*.prof
 logs/
 cache/
 profiling/
+tmp/
+temp/
+.coverage
+coverage.xml
+lcov.info
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nyc_output/
+nyc-output/
+dist-coverage/
 
 # Secrets and credentials
 .env
@@ -39,6 +122,28 @@ secrets/
 *.pub
 *.keystore
 *.jks
+*.kdbx
+*.gpg
+*.secret
+*.token
+*.password
+*.cert
+credentials/
+secure/
+config/local/
+config/dev/
+config/private/
+
+# System / OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
 
 # Third-party checkout metadata
 third_party/**/.git/
