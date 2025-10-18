@@ -8,7 +8,7 @@
 .temp
 .log
 .cache
-
+.logs
 # Godot
 .godot/
 .import/
