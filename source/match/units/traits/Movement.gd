@@ -58,9 +58,8 @@ func _physics_process(delta):
 		return
 	var next_path_position: Vector3 = get_next_path_position()
 	var current_agent_position: Vector3 = _unit.global_transform.origin
-	var new_velocity: Vector3 = (
-		(next_path_position - current_agent_position).normalized() * _interim_speed
-	)
+	var displacement := next_path_position - current_agent_position
+	var new_velocity: Vector3 = displacement.normalized() * _interim_speed
 	set_velocity(new_velocity)
 
 
