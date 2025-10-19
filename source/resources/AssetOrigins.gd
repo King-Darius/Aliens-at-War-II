@@ -19,7 +19,8 @@ const ORIGINS := {
 			]
 		)
 	},
-	"Meshy Godot Plugin": {
+	"Meshy Godot Plugin":
+	{
 		"repository": "https://github.com/meshy-dev/meshy-godot-plugin",
 		"asset_roots": PackedStringArray(["res://addons/meshy"])
 	}
