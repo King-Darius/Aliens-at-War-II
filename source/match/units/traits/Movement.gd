@@ -17,6 +17,15 @@ const ROTATION_LOW_PASS_FILTER_VELOCITY_THRESHOLD = 0.01  # velocities below wil
 
 const PASSIVE_MOVEMENT_TRACKING_ENABLED = true
 
+const SWARM_NEIGHBOR_RADIUS = 6.5
+const SWARM_SEPARATION_DISTANCE = 2.0
+const SWARM_ALIGNMENT_WEIGHT = 0.8
+const SWARM_COHESION_WEIGHT = 1.1
+const SWARM_SEPARATION_WEIGHT = 1.8
+const SWARM_TARGET_BLEND_WEIGHT = 0.35
+const SWARM_MAX_OFFSET = 3.5
+const SWARM_MAX_NEIGHBORS = 12
+
 @export var domain = Constants.Match.Navigation.Domain.TERRAIN
 @export var speed: float = 4.0
 
@@ -31,6 +40,10 @@ var _total_direction_in_the_low_pass_filter_window = Vector3.ZERO
 var _previously_set_global_transform_of_unit = null
 
 var _passive_movement_detected = false
+var _desired_target_position: Vector3 = Vector3.INF
+var _swarm_target_position: Vector3 = Vector3.INF
+var _swarm_controller = null
+var _last_computed_velocity: Vector3 = Vector3.ZERO
 
 @onready var _match = find_parent("Match")
 @onready var _unit = get_parent()
@@ -38,6 +51,7 @@ var _passive_movement_detected = false
 
 func _physics_process(delta):
 	_interim_speed = speed * delta
+	_update_navigation_target()
 	var fake_direction = _get_fake_direction_due_to_stuck_prevention()
 	if fake_direction != null:
 		set_velocity(fake_direction * _interim_speed)
@@ -66,11 +80,14 @@ func _ready():
 
 
 func move(movement_target: Vector3):
-	target_position = movement_target
+	_desired_target_position = movement_target
+	_update_navigation_target()
 
 
 func stop():
 	target_position = Vector3.INF
+	_desired_target_position = Vector3.INF
+	_swarm_target_position = Vector3.INF
 
 
 func _align_unit_position_to_navigation():
@@ -81,6 +98,121 @@ func _align_unit_position_to_navigation():
 		)
 		- Vector3(0, path_height_offset, 0)
 	)
+
+
+func set_swarm_controller(controller):
+	_swarm_controller = controller
+	if _swarm_controller == null:
+		_swarm_target_position = Vector3.INF
+		if _unit.is_in_group("swarm_units"):
+			_unit.remove_from_group("swarm_units")
+	elif not _unit.is_in_group("swarm_units"):
+		_unit.add_to_group("swarm_units")
+
+
+func set_swarm_target(target_position: Vector3):
+	_swarm_target_position = target_position
+	_update_navigation_target()
+
+
+func clear_swarm_target():
+	_swarm_target_position = Vector3.INF
+	_update_navigation_target()
+
+
+func get_last_velocity() -> Vector3:
+	return _last_computed_velocity
+
+
+func _get_base_target_position() -> Vector3:
+	var has_desired = _desired_target_position != Vector3.INF
+	var has_swarm = _swarm_target_position != Vector3.INF
+	if has_desired and has_swarm:
+		return _desired_target_position.lerp(
+			_swarm_target_position, SWARM_TARGET_BLEND_WEIGHT
+		)
+	if has_desired:
+		return _desired_target_position
+	if has_swarm:
+		return _swarm_target_position
+	return Vector3.INF
+
+
+func _calculate_swarm_offset() -> Vector3:
+	if (
+		_swarm_controller == null
+		or _swarm_target_position == Vector3.INF
+		or not _unit.is_in_group("swarm_units")
+	):
+		return Vector3.ZERO
+	var neighbors = []
+	var base_position = _unit.global_position * Vector3(1, 0, 1)
+	for neighbor in get_tree().get_nodes_in_group("swarm_units"):
+		if neighbor == _unit or not is_instance_valid(neighbor):
+			continue
+		if neighbor.player != _unit.player:
+			continue
+		if neighbor.movement_domain != _unit.movement_domain:
+			continue
+		var neighbor_position = neighbor.global_position * Vector3(1, 0, 1)
+		var offset = neighbor_position - base_position
+		var distance = offset.length()
+		if is_zero_approx(distance) or distance > SWARM_NEIGHBOR_RADIUS:
+			continue
+		neighbors.append([neighbor, offset, distance])
+		if neighbors.size() >= SWARM_MAX_NEIGHBORS:
+			break
+	if neighbors.is_empty():
+		return Vector3.ZERO
+	var cohesion_accumulator = Vector3.ZERO
+	var separation = Vector3.ZERO
+	var alignment_accumulator = Vector3.ZERO
+	var alignment_count = 0
+	for neighbor_tuple in neighbors:
+		var neighbor = neighbor_tuple[0]
+		var offset: Vector3 = neighbor_tuple[1]
+		var distance: float = neighbor_tuple[2]
+		cohesion_accumulator += neighbor.global_position * Vector3(1, 0, 1)
+		if distance < SWARM_SEPARATION_DISTANCE:
+			var separation_strength = (
+				(SWARM_SEPARATION_DISTANCE - distance) / SWARM_SEPARATION_DISTANCE
+			)
+			separation -= offset.normalized() * separation_strength
+		var neighbor_movement = neighbor.find_child("Movement")
+		if neighbor_movement != null and neighbor_movement.has_method("get_last_velocity"):
+			var neighbor_velocity = neighbor_movement.get_last_velocity() * Vector3(1, 0, 1)
+			if not neighbor_velocity.is_zero_approx():
+				alignment_accumulator += neighbor_velocity.normalized()
+				alignment_count += 1
+	var cohesion_vector = Vector3.ZERO
+	if neighbors.size() > 0:
+		var average_position = cohesion_accumulator / float(neighbors.size())
+		cohesion_vector = (average_position - base_position)
+		if not cohesion_vector.is_zero_approx():
+			cohesion_vector = cohesion_vector.normalized()
+	var alignment_vector = Vector3.ZERO
+	if alignment_count > 0:
+		alignment_vector = (alignment_accumulator / float(alignment_count))
+		if not alignment_vector.is_zero_approx():
+			alignment_vector = alignment_vector.normalized()
+	var offset_vector = (
+		cohesion_vector * SWARM_COHESION_WEIGHT
+		+ alignment_vector * SWARM_ALIGNMENT_WEIGHT
+		+ separation * SWARM_SEPARATION_WEIGHT
+	)
+	if offset_vector.length() > SWARM_MAX_OFFSET:
+		offset_vector = offset_vector.normalized() * SWARM_MAX_OFFSET
+	return offset_vector * Vector3(1, 0, 1)
+
+
+func _update_navigation_target():
+	var base_target = _get_base_target_position()
+	if base_target == Vector3.INF:
+		target_position = Vector3.INF
+		return
+	var adjusted_target = base_target + _calculate_swarm_offset()
+	if target_position == Vector3.INF or not target_position.is_equal_approx(adjusted_target):
+		target_position = adjusted_target
 
 
 func _is_moving_actively():
@@ -179,6 +311,7 @@ func _update_passive_movement_tracking(safe_velocity):
 
 
 func _on_velocity_computed(safe_velocity: Vector3):
+	_last_computed_velocity = safe_velocity
 	_update_stuck_prevention(safe_velocity)
 	_rotate_in_direction(safe_velocity * Vector3(1, 0, 1))
 	_unit.global_transform.origin = _unit.global_transform.origin.move_toward(
@@ -190,4 +323,6 @@ func _on_velocity_computed(safe_velocity: Vector3):
 
 func _on_navigation_finished():
 	target_position = Vector3.INF
+	_desired_target_position = Vector3.INF
+	_swarm_target_position = Vector3.INF
 	movement_finished.emit()

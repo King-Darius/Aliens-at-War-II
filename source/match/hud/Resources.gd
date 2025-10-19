@@ -1,16 +1,40 @@
-extends VBoxContainer
+extends HBoxContainer
 
 const Human = preload("res://source/match/players/human/Human.gd")
 
+@export var resources_bar_scene: PackedScene = preload("res://source/match/hud/ResourcesBar.tscn")
+
 @onready var _match = find_parent("Match")
+
+var _player_to_bar := {}
 
 # TODO: handle human player removal/addition
 
 
 func _ready():
-	await find_parent("Match").ready
-	_hide_all_bars()
-	_setup_all_bars()
+	await _match.ready
+	_rebuild_bars()
+	_update_visible_bars()
+
+
+func _rebuild_bars():
+	for child in get_children():
+		child.queue_free()
+	_player_to_bar.clear()
+	if resources_bar_scene == null:
+		return
+	for player in get_tree().get_nodes_in_group("players"):
+		var bar = resources_bar_scene.instantiate()
+		bar.hide()
+		add_child(bar)
+		bar.setup(player)
+		_player_to_bar[player] = bar
+
+
+func _update_visible_bars():
+	for bar in _player_to_bar.values():
+		bar.hide()
+	var players_to_show = []
 	var human_players = get_tree().get_nodes_in_group("players").filter(
 		func(player): return player is Human
 	)
@@ -18,25 +42,9 @@ func _ready():
 		_match.settings.visibility == _match.settings.Visibility.PER_PLAYER
 		and not human_players.is_empty()
 	):
-		_show_player_bars([human_players[0]])
+		players_to_show = [human_players[0]]
 	else:
-		_show_player_bars(get_tree().get_nodes_in_group("players"))
-
-
-func _hide_all_bars():
-	for bar in get_children():
-		bar.hide()
-
-
-func _setup_all_bars():
-	var bar_nodes = get_children()
-	var players = get_tree().get_nodes_in_group("players")
-	for i in range(players.size()):
-		bar_nodes[i].setup(players[i])
-
-
-func _show_player_bars(players):
-	for player in players:
-		for bar_node in get_children():
-			if bar_node.player == player:
-				bar_node.show()
+		players_to_show = get_tree().get_nodes_in_group("players")
+	for player in players_to_show:
+		if _player_to_bar.has(player):
+			_player_to_bar[player].show()

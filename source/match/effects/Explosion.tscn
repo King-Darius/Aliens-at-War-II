@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3 uid="uid://c4xz3r9jtdv4f"]
+
+[ext_resource type="Script" path="res://source/match/effects/Explosion.gd" id="1_3y4gq"]
+
+[sub_resource type="Gradient" id="Gradient_nusad"]
+offsets = PackedFloat32Array(0, 0.45, 1)
+colors = PackedColorArray(1, 0.72549, 0.341176, 1, 1, 0.305882, 0.054902, 0.576471, 0.0588235, 0.0588235, 0.0588235, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_l8nq4"]
+gradient = SubResource("Gradient_nusad")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ebfhq"]
+emission_shape = 1
+emission_sphere_radius = 0.4
+spread = 180.0
+initial_velocity_min = 6.0
+initial_velocity_max = 13.0
+angular_velocity_min = -6.0
+angular_velocity_max = 6.0
+gravity = Vector3(0, -3, 0)
+linear_accel = -3.0
+scale_min = 0.6
+scale_max = 1.6
+color_ramp = SubResource("GradientTexture1D_l8nq4")
+
+[sub_resource type="QuadMesh" id="QuadMesh_q8r6b"]
+size = Vector2(1.2, 1.2)
+
+[node name="Explosion" type="Node3D"]
+script = ExtResource("1_3y4gq")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+amount = 160
+one_shot = true
+explosiveness = 0.8
+lifetime = 0.8
+process_material = SubResource("ParticleProcessMaterial_ebfhq")
+draw_pass_1 = SubResource("QuadMesh_q8r6b")
+visibility_aabb = AABB(-4, -2, -4, 8, 4, 8)

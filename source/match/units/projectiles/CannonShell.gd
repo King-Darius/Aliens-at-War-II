@@ -2,6 +2,8 @@ extends Node3D
 
 var target_unit = null
 
+const ImpactEffectScene = preload("res://source/match/effects/ImpactEffect.tscn")
+
 @onready var _unit = get_parent()
 @onready var _unit_particles = find_child("OriginParticles")
 @onready var _timer = find_child("Timer")
@@ -13,6 +15,7 @@ func _ready():
 	_setup_unit_particles()
 	_setup_timer()
 	target_unit.hp -= _unit.attack_damage
+	_spawn_impact_effect()
 
 
 func _setup_timer():
@@ -29,3 +32,19 @@ func _setup_unit_particles():
 	)
 	_unit_particles.global_transform = a_global_transform
 	_unit_particles.emitting = true
+
+
+func _spawn_impact_effect():
+	if target_unit == null or not is_instance_valid(target_unit):
+		return
+	var effect = ImpactEffectScene.instantiate()
+	effect.global_transform.origin = target_unit.global_position
+	var match = _unit.find_parent("Match")
+	if match != null:
+		var container = match.get_node_or_null("Effects")
+		if container != null:
+			container.add_child(effect)
+		else:
+			match.add_child(effect)
+	else:
+		get_tree().current_scene.add_child(effect)
