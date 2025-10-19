@@ -80,15 +80,34 @@ func _try_ordering_selected_workers_to_construct_structure(potential_structure):
 
 func _navigate_selected_units_towards_unit(target_unit):
 	var at_least_one_unit_navigated = false
+	var units_requiring_swarm_navigation = []
 	for unit in get_tree().get_nodes_in_group("selected_units"):
 		if not unit.is_in_group("controlled_units"):
 			continue
-		if _navigate_unit_towards_unit(unit, target_unit):
+		if _navigate_unit_towards_unit(unit, target_unit, units_requiring_swarm_navigation):
 			at_least_one_unit_navigated = true
+	if not units_requiring_swarm_navigation.is_empty():
+		var terrain_units = []
+		var air_units = []
+		for unit in units_requiring_swarm_navigation:
+			match unit.movement_domain:
+				Constants.Match.Navigation.Domain.AIR:
+					air_units.append(unit)
+				_:
+					terrain_units.append(unit)
+		var new_unit_targets = Utils.Match.Unit.Movement.crowd_moved_to_unit(
+			terrain_units, target_unit
+		)
+		new_unit_targets += Utils.Match.Unit.Movement.crowd_moved_to_unit(air_units, target_unit)
+		for tuple in new_unit_targets:
+			var unit = tuple[0]
+			var new_target = tuple[1]
+			unit.action = Actions.MovingToUnit.new(target_unit, new_target)
+		at_least_one_unit_navigated = true
 	return at_least_one_unit_navigated
 
 
-func _navigate_unit_towards_unit(unit, target_unit):
+func _navigate_unit_towards_unit(unit, target_unit, units_requiring_swarm_navigation = null):
 	if Actions.CollectingResourcesSequentially.is_applicable(unit, target_unit):
 		unit.action = Actions.CollectingResourcesSequentially.new(target_unit)
 		return true
@@ -105,7 +124,10 @@ func _navigate_unit_towards_unit(unit, target_unit):
 		unit.action = Actions.Following.new(target_unit)
 		return true
 	if Actions.MovingToUnit.is_applicable(unit):
-		unit.action = Actions.MovingToUnit.new(target_unit)
+		if units_requiring_swarm_navigation != null:
+			units_requiring_swarm_navigation.append(unit)
+		else:
+			unit.action = Actions.MovingToUnit.new(target_unit)
 		return true
 	if _try_setting_rally_point_to_unit(unit, target_unit):
 		return true

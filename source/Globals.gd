@@ -34,9 +34,7 @@ func _toggle_god_mode():
 func _register_third_party_content():
 	var registry := get_tree().root.get_node_or_null("AssetOrigins")
 	if registry == null:
-		push_warning(
-			"AssetOrigins autoload not found; third-party assets will not be advertised."
-		)
+		push_warning("AssetOrigins autoload not found; third-party assets will not be advertised.")
 		return
 	if registry.has_method("describe_all"):
 		imported_content_summary = registry.describe_all()
