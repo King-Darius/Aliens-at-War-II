@@ -14,8 +14,8 @@ class Actions:
 	const AutoAttacking = preload("res://source/match/units/actions/AutoAttacking.gd")
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 
-@onready var _swarm_controller = get_parent().find_child("SwarmController")
 
+@onready var _swarm_controller = get_parent().find_child("SwarmController")
 
 
 func _ready():
@@ -23,8 +23,6 @@ func _ready():
 	MatchSignals.unit_targeted.connect(_on_unit_targeted)
 	MatchSignals.unit_spawned.connect(_on_unit_spawned)
 	MatchSignals.navigate_unit_to_rally_point.connect(_on_navigate_unit_to_rally_point)
-
-
 
 
 func _try_navigating_selected_units_towards_position(target_point):
@@ -121,9 +119,7 @@ func _navigate_selected_units_towards_unit(target_unit):
 			and not swarm_units_commanded.is_empty()
 			and target_unit != null
 		):
-			_swarm_controller.issue_move_command(
-				target_unit.global_position, swarm_units_commanded
-			)
+			_swarm_controller.issue_move_command(target_unit.global_position, swarm_units_commanded)
 		at_least_one_unit_navigated = true
 	return at_least_one_unit_navigated
 

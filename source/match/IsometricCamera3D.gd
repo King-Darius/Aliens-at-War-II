@@ -170,11 +170,7 @@ func _apply_camera_shake(delta: float):
 	if _shake_time_left <= 0.0 or _shake_amplitude <= 0.0:
 		return
 	_shake_time_left = max(0.0, _shake_time_left - delta)
-	var offset = Vector3(
-		randf_range(-1.0, 1.0),
-		randf_range(-0.35, 0.35),
-		randf_range(-1.0, 1.0)
-	)
+	var offset = Vector3(randf_range(-1.0, 1.0), randf_range(-0.35, 0.35), randf_range(-1.0, 1.0))
 	_shake_offset = offset * _shake_amplitude
 	global_position += _shake_offset
 	if _shake_time_left == 0.0:

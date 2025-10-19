@@ -127,9 +127,7 @@ func _get_base_target_position() -> Vector3:
 	var has_desired = _desired_target_position != Vector3.INF
 	var has_swarm = _swarm_target_position != Vector3.INF
 	if has_desired and has_swarm:
-		return _desired_target_position.lerp(
-			_swarm_target_position, SWARM_TARGET_BLEND_WEIGHT
-		)
+		return _desired_target_position.lerp(_swarm_target_position, SWARM_TARGET_BLEND_WEIGHT)
 	if has_desired:
 		return _desired_target_position
 	if has_swarm:
