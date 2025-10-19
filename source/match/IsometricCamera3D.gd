@@ -21,6 +21,9 @@ const EXPECTED_PROJECTION = PROJECTION_ORTHOGONAL
 
 var _mouse_pos_when_rotation_started = null
 var _camera_global_pos_when_rotation_started = null
+var _shake_time_left: float = 0.0
+var _shake_amplitude: float = 0.0
+var _shake_offset: Vector3 = Vector3.ZERO
 
 
 func _ready():
@@ -29,13 +32,16 @@ func _ready():
 		is_equal_approx(rotation_degrees.x, EXPECTED_X_ROTATION_DEGREES), "unexptected X rotation"
 	)
 	_align_camera_properties_to_current_size()
+	MatchSignals.camera_shake_requested.connect(_on_camera_shake_requested)
 
 
 func _physics_process(delta: float):
+	_clear_shake_offset()
 	var realtime_delta = delta / Engine.time_scale
-	if _try_handling_movement(realtime_delta):
-		return
-	_try_handling_arrowkey_rotation(realtime_delta)
+	var movement_handled = _try_handling_movement(realtime_delta)
+	if not movement_handled:
+		_try_handling_arrowkey_rotation(realtime_delta)
+	_apply_camera_shake(delta)
 
 
 func _unhandled_input(event: InputEvent):
@@ -151,6 +157,32 @@ func _try_handling_mouse_rotation(event: InputEvent):
 			(mouse_pos.x - _mouse_pos_when_rotation_started.x) * mouse_rotation_speed
 		)
 		_rotate_from_reference_position_by(_camera_global_pos_when_rotation_started, angle_radians)
+
+
+func _clear_shake_offset():
+	if _shake_offset.is_zero_approx():
+		return
+	global_position -= _shake_offset
+	_shake_offset = Vector3.ZERO
+
+
+func _apply_camera_shake(delta: float):
+	if _shake_time_left <= 0.0 or _shake_amplitude <= 0.0:
+		return
+	_shake_time_left = max(0.0, _shake_time_left - delta)
+	var offset = Vector3(randf_range(-1.0, 1.0), randf_range(-0.35, 0.35), randf_range(-1.0, 1.0))
+	_shake_offset = offset * _shake_amplitude
+	global_position += _shake_offset
+	if _shake_time_left == 0.0:
+		_shake_amplitude = 0.0
+
+
+func _on_camera_shake_requested(amplitude: float, duration: float):
+	if amplitude <= 0.0 or duration <= 0.0:
+		return
+	_clear_shake_offset()
+	_shake_amplitude = amplitude
+	_shake_time_left = duration
 
 
 func _reset_rotation():

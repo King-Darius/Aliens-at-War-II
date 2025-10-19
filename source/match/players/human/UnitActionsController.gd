@@ -15,6 +15,9 @@ class Actions:
 	const Constructing = preload("res://source/match/units/actions/Constructing.gd")
 
 
+@onready var _swarm_controller = get_parent().find_child("SwarmController")
+
+
 func _ready():
 	MatchSignals.terrain_targeted.connect(_on_terrain_targeted)
 	MatchSignals.unit_targeted.connect(_on_unit_targeted)
@@ -45,10 +48,15 @@ func _try_navigating_selected_units_towards_position(target_point):
 	new_unit_targets += Utils.Match.Unit.Movement.crowd_moved_to_new_pivot(
 		air_units_to_move, target_point
 	)
+	var units_commanded = []
 	for tuple in new_unit_targets:
 		var unit = tuple[0]
 		var new_target = tuple[1]
 		unit.action = Actions.Moving.new(new_target)
+		if not units_commanded.has(unit):
+			units_commanded.append(unit)
+	if _swarm_controller != null and not units_commanded.is_empty():
+		_swarm_controller.issue_move_command(target_point, units_commanded)
 
 
 func _try_setting_rally_points(target_point: Vector3):
@@ -99,10 +107,19 @@ func _navigate_selected_units_towards_unit(target_unit):
 			terrain_units, target_unit
 		)
 		new_unit_targets += Utils.Match.Unit.Movement.crowd_moved_to_unit(air_units, target_unit)
+		var swarm_units_commanded = []
 		for tuple in new_unit_targets:
 			var unit = tuple[0]
 			var new_target = tuple[1]
 			unit.action = Actions.MovingToUnit.new(target_unit, new_target)
+			if not swarm_units_commanded.has(unit):
+				swarm_units_commanded.append(unit)
+		if (
+			_swarm_controller != null
+			and not swarm_units_commanded.is_empty()
+			and target_unit != null
+		):
+			_swarm_controller.issue_move_command(target_unit.global_position, swarm_units_commanded)
 		at_least_one_unit_navigated = true
 	return at_least_one_unit_navigated
 

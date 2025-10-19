@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dh8dedilkhuoy"]
+[gd_scene load_steps=7 format=3 uid="uid://dh8dedilkhuoy"]
 
 [ext_resource type="Script" path="res://source/match/players/human/Human.gd" id="1_7iu1j"]
 [ext_resource type="Script" path="res://source/match/players/human/UnitActionsController.gd" id="1_m624e"]
 [ext_resource type="PackedScene" uid="uid://q5w474dvts3f" path="res://source/match/players/human/StructurePlacementHandler.tscn" id="2_bbqrb"]
 [ext_resource type="Script" path="res://source/match/players/human/VoiceNarratorController.gd" id="4_ljr74"]
 [ext_resource type="Script" path="res://source/match/players/human/UnitVoicesController.gd" id="5_i4ssw"]
+[ext_resource type="Script" path="res://source/match/players/human/SwarmController.gd" id="6_fv0e0"]
 
 [node name="Human" type="Node3D"]
 script = ExtResource("1_7iu1j")
@@ -14,6 +15,9 @@ color = Color(0.4, 0.694118, 1, 1)
 
 [node name="UnitActionsController" type="Node" parent="."]
 script = ExtResource("1_m624e")
+
+[node name="SwarmController" type="Node3D" parent="."]
+script = ExtResource("6_fv0e0")
 
 [node name="VoiceNarratorController" type="Node" parent="."]
 process_mode = 3

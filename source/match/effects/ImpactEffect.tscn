@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3 uid="uid://d1azb2hv1me7g"]
+
+[ext_resource type="Script" path="res://source/match/effects/ImpactEffect.gd" id="1_b2bx1"]
+
+[sub_resource type="Gradient" id="Gradient_t5yu4"]
+offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(1, 0.976471, 0.815686, 1, 1, 0.509804, 0.196078, 0.494118, 0.203922, 0.203922, 0.203922, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_c6m1x"]
+gradient = SubResource("Gradient_t5yu4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_zv4zq"]
+emission_shape = 1
+emission_sphere_radius = 0.2
+spread = 140.0
+initial_velocity_min = 3.0
+initial_velocity_max = 7.0
+gravity = Vector3(0, -1.5, 0)
+scale_min = 0.4
+scale_max = 1.0
+color_ramp = SubResource("GradientTexture1D_c6m1x")
+
+[sub_resource type="QuadMesh" id="QuadMesh_x2a0f"]
+size = Vector2(0.6, 0.6)
+
+[node name="ImpactEffect" type="Node3D"]
+script = ExtResource("1_b2bx1")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+amount = 64
+one_shot = true
+explosiveness = 0.7
+lifetime = 0.5
+process_material = SubResource("ParticleProcessMaterial_zv4zq")
+draw_pass_1 = SubResource("QuadMesh_x2a0f")
+visibility_aabb = AABB(-3, -2, -3, 6, 4, 6)
+
+[node name="Timer" type="Timer" parent="."]
+process_callback = 0
+one_shot = true

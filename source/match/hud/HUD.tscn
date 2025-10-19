@@ -1,0 +1,191 @@
+[gd_scene load_steps=10 format=3 uid="uid://hdud6wce3k4v4"]
+
+[ext_resource type="Script" path="res://source/match/hud/HUD.gd" id="1_hx9fj"]
+[ext_resource type="Script" path="res://source/match/hud/Resources.gd" id="2_j1k08"]
+[ext_resource type="Script" path="res://source/match/hud/Minimap.gd" id="3_w55ro"]
+[ext_resource type="PackedScene" path="res://source/match/hud/ProductionQueue.tscn" id="4_s4a2q"]
+[ext_resource type="PackedScene" path="res://source/match/hud/UnitMenus.tscn" id="5_qn8ca"]
+[ext_resource type="PackedScene" path="res://source/match/hud/ResourcesBar.tscn" id="6_x1d9d"]
+[ext_resource type="Shader" path="res://source/shaders/2d/white_transparent.gdshader" id="7_pz9m1"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_2y46f"]
+viewport_path = NodePath("../FogOfWar/CombinedViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5le0u"]
+resource_local_to_scene = true
+shader = ExtResource("7_pz9m1")
+shader_parameter/reference_texture = SubResource("ViewportTexture_2y46f")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_p4s8j"]
+viewport_path = NodePath("Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer/MinimapViewport")
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hx9fj")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RootLayout" type="VBoxContainer" parent="Root"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="TopBarMargin" type="MarginContainer" parent="Root/RootLayout"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 0
+
+[node name="TopBarPanel" type="PanelContainer" parent="Root/RootLayout/TopBarMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="TopBar" type="HBoxContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 12
+
+[node name="ResourcesPanel" type="PanelContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 1
+
+[node name="ResourcesMargin" type="MarginContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar/ResourcesPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="Resources" type="HBoxContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar/ResourcesPanel/ResourcesMargin"]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 1
+script = ExtResource("2_j1k08")
+resources_bar_scene = ExtResource("6_x1d9d")
+theme_override_constants/separation = 8
+
+[node name="TopBarSpacer" type="Control" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="HotkeyPanel" type="PanelContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 1
+
+[node name="HotkeyMargin" type="MarginContainer" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar/HotkeyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="HotkeyLabel" type="Label" parent="Root/RootLayout/TopBarMargin/TopBarPanel/TopBar/HotkeyPanel/HotkeyMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 1
+horizontal_alignment = 2
+vertical_alignment = 1
+text = ""
+
+[node name="CenterSpacer" type="Control" parent="Root/RootLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BottomBarMargin" type="MarginContainer" parent="Root/RootLayout"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="BottomBar" type="HBoxContainer" parent="Root/RootLayout/BottomBarMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 16
+
+[node name="BottomLeftColumn" type="VBoxContainer" parent="Root/RootLayout/BottomBarMargin/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="MinimapPanel" type="PanelContainer" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn"]
+layout_mode = 2
+script = ExtResource("3_w55ro")
+size_flags_horizontal = 1
+size_flags_vertical = 1
+custom_minimum_size = Vector2(256, 256)
+
+[node name="MarginContainer" type="MarginContainer" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MinimapViewport" type="SubViewport" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer"]
+layout_mode = 2
+disable_3d = true
+size = Vector2i(200, 200)
+
+[node name="Background" type="ColorRect" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer/MinimapViewport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.351562, 0.351562, 0.351562, 1)
+
+[node name="FogOfWarMask" type="ColorRect" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer/MinimapViewport"]
+material = SubResource("ShaderMaterial_5le0u")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CameraIndicator" type="Line2D" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer/MinimapViewport"]
+points = PackedVector2Array(5, 5, 5, 30, 30, 30, 30, 5, 5, 5)
+width = 1.0
+begin_cap_mode = 1
+end_cap_mode = 1
+antialiased = true
+
+[node name="MinimapTextureRect" type="TextureRect" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomLeftColumn/MinimapPanel/MarginContainer"]
+layout_mode = 2
+texture = SubResource("ViewportTexture_p4s8j")
+stretch_mode = 5
+
+[node name="BottomSpacer" type="Control" parent="Root/RootLayout/BottomBarMargin/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 1
+
+[node name="BottomRightColumn" type="VBoxContainer" parent="Root/RootLayout/BottomBarMargin/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 12
+
+[node name="ProductionQueue" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomRightColumn" instance=ExtResource("4_s4a2q")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+
+[node name="UnitMenus" parent="Root/RootLayout/BottomBarMargin/BottomBar/BottomRightColumn" instance=ExtResource("5_qn8ca")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
