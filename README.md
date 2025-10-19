@@ -69,14 +69,14 @@ See [contributors](https://github.com/lampe-games/godot-open-rts/graphs/contribu
 This fork adds and maintains the following third-party asset packs on top of the upstream project:
  - 3D Space Kit by [Kenney](https://www.kenney.nl/assets/space-kit)
  - Modular colonies from [KayKit City Builder Bits 1.0](https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0)
- **To be removed due to license conflicts - Systemic city builder references from [Egregoria](https://github.com/Uriopass/Egregoria) **
  - Mesh ingestion toolchain powered by [meshy-dev/meshy-godot-plugin](https://github.com/meshy-dev/meshy-godot-plugin)
+
+Previously referenced materials from the Egregoria project have been removed to resolve licensing conflicts.
 
 ## Third-party content layout
 
 - `res://assets/kenney_space_kit` - Kenney Space Kit ships, structures, and textures
 - `res://assets/kaykit_city_builder` - KayKit City Builder Bits 1.0 meshes and textures ready for import
-- `res://assets/egregoria` - reference systems, textures, and HUD motifs sourced from Egregoria [MARKED FOR REMOVAL]
 - `res://addons/meshy` - Meshy Godot editor plugin for rapid mesh previews/imports
 - `res://third_party` - upstream snapshots retained for tooling and license review
 
