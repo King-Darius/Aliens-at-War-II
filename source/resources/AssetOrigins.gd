@@ -19,16 +19,6 @@ const ORIGINS := {
 			]
 		)
 	},
-	"Egregoria":
-	{
-		"repository": "https://github.com/Uriopass/Egregoria",
-		"asset_roots": PackedStringArray([
-			"res://assets/egregoria/assets",
-			"res://assets/egregoria/assets_gui",
-			"res://third_party/egregoria/assets",
-			"res://third_party/egregoria/assets_gui"
-		])
-	},
 	"Meshy Godot Plugin": {
 		"repository": "https://github.com/meshy-dev/meshy-godot-plugin",
 		"asset_roots": PackedStringArray(["res://addons/meshy"])

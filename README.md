@@ -71,6 +71,8 @@ This fork adds and maintains the following third-party asset packs on top of the
  - Modular colonies from [KayKit City Builder Bits 1.0](https://github.com/KayKit-Game-Assets/KayKit-City-Builder-Bits-1.0)
  - Mesh ingestion toolchain powered by [meshy-dev/meshy-godot-plugin](https://github.com/meshy-dev/meshy-godot-plugin)
 
+Previously referenced materials from the Egregoria project have been removed to resolve licensing conflicts.
+
 ## Third-party content layout
 
 - `res://assets/kenney_space_kit` - Kenney Space Kit ships, structures, and textures
