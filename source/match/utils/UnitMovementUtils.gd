@@ -7,11 +7,11 @@ const DISTANCE_REDUCTION_BY_SUBTRACTION_ITERATIONS_MAX = 10
 
 
 static func crowd_moved_to_new_pivot(units, new_pivot):
-	"""calculates new unit positions relative to new_pivot"""
-	if units.is_empty():
-		return []
-	if units.size() == 1:
-		return [[units[0], new_pivot]]
+        """calculates new unit positions relative to new_pivot"""
+        if units.is_empty():
+                return []
+        if units.size() == 1:
+                return [[units[0], new_pivot]]
 	var old_pivot = calculate_aabb_crowd_pivot_yless(units)
 	var yless_unit_offsets_from_old_pivot = _calculate_yless_unit_offsets_from_old_pivot(
 		units, old_pivot
@@ -22,14 +22,35 @@ static func crowd_moved_to_new_pivot(units, new_pivot):
 	var condensed_unit_positions = _attract_unit_positions_towards_pivot(
 		new_unit_positions, new_pivot, Constants.Match.Units.ADHERENCE_MARGIN_M * 2
 	)
-	return condensed_unit_positions
+        return condensed_unit_positions
+
+
+static func crowd_moved_to_unit(units, target_unit):
+        """calculates swarm-friendly positions around a target unit"""
+        if units.is_empty():
+                return []
+        var pivot = target_unit.global_position_yless
+        var new_unit_positions = crowd_moved_to_new_pivot(units, pivot)
+        var adjusted_unit_positions = []
+        for tuple in new_unit_positions:
+                var unit = tuple[0]
+                var position = tuple[1] * Vector3(1, 0, 1)
+                var offset_from_target = position - pivot
+                if offset_from_target.length() < 0.001:
+                        offset_from_target = Vector3.RIGHT
+                var minimum_distance = target_unit.radius + unit.radius + Constants.Match.Units.ADHERENCE_MARGIN_M
+                var adjusted_offset = offset_from_target.normalized() * max(
+                        offset_from_target.length(), minimum_distance
+                )
+                adjusted_unit_positions.append([unit, pivot + adjusted_offset])
+        return adjusted_unit_positions
 
 
 static func calculate_aabb_crowd_pivot_yless(units):
-	"""calculates pivot which is a center of crowd AABB"""
-	var unit_positions = []
-	for unit in units:
-		unit_positions.append(unit.global_position)
+        """calculates pivot which is a center of crowd AABB"""
+        var unit_positions = []
+        for unit in units:
+                unit_positions.append(unit.global_position)
 	var begin = Vector3(_calculate_min_x(unit_positions), 0.0, _calculate_min_z(unit_positions))
 	var end = Vector3(_calculate_max_x(unit_positions), 0.0, _calculate_max_z(unit_positions))
 	return (begin + end) / 2.0 * Vector3(1, 0, 1)
