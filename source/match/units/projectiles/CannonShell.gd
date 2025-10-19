@@ -39,12 +39,12 @@ func _spawn_impact_effect():
 		return
 	var effect = ImpactEffectScene.instantiate()
 	effect.global_transform.origin = target_unit.global_position
-	var match = _unit.find_parent("Match")
-	if match != null:
-		var container = match.get_node_or_null("Effects")
+	var match_node = _unit.find_parent("Match")
+	if match_node != null:
+		var container = match_node.get_node_or_null("Effects")
 		if container != null:
 			container.add_child(effect)
 		else:
-			match.add_child(effect)
+			match_node.add_child(effect)
 	else:
 		get_tree().current_scene.add_child(effect)
