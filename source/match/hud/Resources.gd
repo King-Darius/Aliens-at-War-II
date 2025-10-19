@@ -4,9 +4,9 @@ const Human = preload("res://source/match/players/human/Human.gd")
 
 @export var resources_bar_scene: PackedScene = preload("res://source/match/hud/ResourcesBar.tscn")
 
-@onready var _match = find_parent("Match")
-
 var _player_to_bar := {}
+
+@onready var _match = find_parent("Match")
 
 # TODO: handle human player removal/addition
 

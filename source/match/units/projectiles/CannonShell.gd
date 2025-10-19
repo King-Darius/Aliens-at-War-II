@@ -1,8 +1,8 @@
 extends Node3D
 
-var target_unit = null
-
 const ImpactEffectScene = preload("res://source/match/effects/ImpactEffect.tscn")
+
+var target_unit = null
 
 @onready var _unit = get_parent()
 @onready var _unit_particles = find_child("OriginParticles")
