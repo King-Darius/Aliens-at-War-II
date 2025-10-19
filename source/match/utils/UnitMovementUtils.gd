@@ -25,6 +25,29 @@ static func crowd_moved_to_new_pivot(units, new_pivot):
 	return condensed_unit_positions
 
 
+static func crowd_moved_to_unit(units, target_unit):
+	"""calculates swarm-friendly positions around a target unit"""
+	if units.is_empty():
+		return []
+	var pivot = target_unit.global_position_yless
+	var new_unit_positions = crowd_moved_to_new_pivot(units, pivot)
+	var adjusted_unit_positions = []
+	for tuple in new_unit_positions:
+		var unit = tuple[0]
+		var position = tuple[1] * Vector3(1, 0, 1)
+		var offset_from_target = position - pivot
+		if offset_from_target.length() < 0.001:
+			offset_from_target = Vector3.RIGHT
+		var minimum_distance = (
+			target_unit.radius + unit.radius + Constants.Match.Units.ADHERENCE_MARGIN_M
+		)
+		var adjusted_offset = (
+			offset_from_target.normalized() * max(offset_from_target.length(), minimum_distance)
+		)
+		adjusted_unit_positions.append([unit, pivot + adjusted_offset])
+	return adjusted_unit_positions
+
+
 static func calculate_aabb_crowd_pivot_yless(units):
 	"""calculates pivot which is a center of crowd AABB"""
 	var unit_positions = []

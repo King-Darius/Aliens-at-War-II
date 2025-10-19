@@ -25,12 +25,16 @@ This game is not going to be a very advanced RTS that would compete with other g
  - [x] units disappearing in fog of war
  - [x] minimap
  - [x] swarm movement to position
- - [ ] swarm movement to unit
+ - [x] swarm movement to unit
  - [x] simple UI
  - [ ] polished UI
  - [ ] sounds
  - [ ] music
  - [ ] VFX
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the long-term plan inspired by Beyond All Reason's approach to large-scale RTS development.
 
 ## Godot compatibility
 
