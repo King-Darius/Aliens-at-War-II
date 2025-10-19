@@ -25,15 +25,6 @@ const ORIGINS := {
 			"res://third_party/egregoria/assets_gui"
 		])
 	},
-	"lo-th 3d.city": {
-		"repository": "https://github.com/lo-th/3d.city",
-		"asset_roots": PackedStringArray([
-			"res://assets/three_d_city/assets",
-			"res://assets/three_d_city/sound",
-			"res://third_party/3d-city/assets",
-			"res://third_party/3d-city/sound"
-		])
-	},
 	"Meshy Godot Plugin": {
 		"repository": "https://github.com/meshy-dev/meshy-godot-plugin",
 		"asset_roots": PackedStringArray([
