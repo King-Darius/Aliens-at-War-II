@@ -6,6 +6,12 @@ Open Source real-time strategy game made with Godot 4.
 
 Originally created as [godot-open-rts](https://github.com/lampe-games/godot-open-rts) by Lampe Games, this repository tracks that upstream codebase while curating a fork that layers in additional space-themed assets, skyline backdrops, and supporting tools tailored for the *Aliens at War II* setting.
 
+## Current state of the fork
+
+This branch ships a fully playable sandbox skirmish experience with the core *Aliens at War II* art pass and balance tuning applied. Players can field one faction, collect the two primary resources, and battle AI opponents across terrain featuring air and ground units with fog-of-war awareness. The UX remains intentionally lightweight while we prioritize stabilization, licensing hygiene, and technical-debt clean up described in the roadmap.
+
+Audio production has not begun beyond placeholder text-to-speech unit acknowledgements, and cinematic VFX polish is still on the backlog. Contributors interested in sound design, soundtrack composition, or UI refinement are especially welcome.
+
 ## Purposes of this project
 
 This game is not going to be a very advanced RTS that would compete with other games of this genre. Instead, it will focus on simplicity and clean design so that it can:
@@ -34,7 +40,7 @@ This game is not going to be a very advanced RTS that would compete with other g
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for the long-term plan inspired by Beyond All Reason's approach to large-scale RTS development.
+See [ROADMAP.md](ROADMAP.md) for the long-term plan inspired by Beyond All Reason's approach to large-scale RTS development. Phase 0 stabilization tasks are currently in-flight, with later UX polish, multiplayer, and live-ops milestones queued for future releases.
 
 ## Godot compatibility
 
